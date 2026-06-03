@@ -1,0 +1,11 @@
+fastapi
+uvicorn[standard]
+yfinance
+pandas
+numpy
+scipy
+scikit-learn
+pydantic
+pydantic-settings
+httpx
+aiofiles
