@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useAppStore } from './stores/store'
 import { getSymbols, getSectors, getStockDNA, compareStocks, getSectorDNA } from './api'
-import type { EmbeddingPoint } from './api'
 import SignatureChart from './components/dna/SignatureChart'
 import RadarChart from './components/radar/RadarChart'
 import ScatterPlot from './components/radar/ScatterPlot'
