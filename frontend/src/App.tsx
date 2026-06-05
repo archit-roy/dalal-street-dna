@@ -4,6 +4,7 @@ import { getSymbols, getSectors, getStockDNA, compareStocks, getSectorDNA } from
 import SignatureChart from './components/dna/SignatureChart'
 import RadarChart from './components/radar/RadarChart'
 import ScatterPlot from './components/radar/ScatterPlot'
+import TraderAnalyser from './components/trader/TraderAnalyser'
 
 const PERIODS = [
   { value: '3mo', label: '3M' },
@@ -112,8 +113,8 @@ export default function App() {
       </div>
 
       {/* Tabs */}
-      <div style={{ borderBottom: '1px solid #27272a', display: 'flex', padding: '0 1rem' }}>
-        {(['dna', 'sector', 'compare'] as const).map(tab => (
+      <div style={{ borderBottom: '1px solid #27272a', display: 'flex', padding: '0 1rem', overflowX: 'auto' }}>
+        {(['dna', 'sector', 'compare', 'trader'] as const).map(tab => (
           <button
             key={tab}
             onClick={() => setActiveTab(tab)}
@@ -126,10 +127,10 @@ export default function App() {
               background: 'transparent',
               color: activeTab === tab ? '#22c55e' : '#71717a',
               cursor: 'pointer',
-              textTransform: 'capitalize',
+              whiteSpace: 'nowrap',
             }}
           >
-            {tab === 'dna' ? 'Stock DNA' : tab === 'sector' ? 'Sector View' : 'Compare'}
+            {tab === 'dna' ? 'Stock DNA' : tab === 'sector' ? 'Sector View' : tab === 'compare' ? 'Compare' : 'My Trades'}
           </button>
         ))}
       </div>
@@ -140,7 +141,6 @@ export default function App() {
         {activeTab === 'dna' && (
           <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
 
-            {/* Symbol picker */}
             <div style={{ background: '#18181b', borderRadius: '0.75rem', border: '1px solid #27272a', padding: '1rem' }}>
               <p style={{ color: '#71717a', fontSize: '0.75rem', marginBottom: '0.75rem' }}>
                 Pick up to 4 stocks — then hit Analyse
@@ -230,25 +230,20 @@ export default function App() {
               {error && <p style={{ color: '#f87171', fontSize: '0.75rem', marginTop: '0.5rem' }}>{error}</p>}
             </div>
 
-            {/* Scatter plot */}
             {embedding.length > 0 && (
               <div style={{ background: '#18181b', borderRadius: '0.75rem', border: '1px solid #27272a', padding: '1rem' }}>
                 <ScatterPlot points={embedding} />
               </div>
             )}
 
-            {/* Radar */}
             {dnaProfiles.length > 0 && (
               <div style={{ background: '#18181b', borderRadius: '0.75rem', border: '1px solid #27272a', padding: '1rem' }}>
                 <RadarChart profiles={dnaProfiles} />
               </div>
             )}
 
-            {/* Stock cards */}
             {dnaProfiles.map(dna => (
               <div key={dna.symbol} style={{ background: '#18181b', borderRadius: '0.75rem', border: '1px solid #27272a', padding: '1rem' }}>
-
-                {/* Header */}
                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '1rem' }}>
                   <div style={{ width: '4px', height: '2.5rem', borderRadius: '9999px', background: dna.sector_color, flexShrink: 0 }} />
                   <div style={{ minWidth: 0 }}>
@@ -265,10 +260,8 @@ export default function App() {
                   </div>
                 </div>
 
-                {/* Signature */}
                 <SignatureChart dna={dna} />
 
-                {/* Style bars */}
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '0.5rem', marginTop: '1rem' }}>
                   {dna.style_dimensions.map(dim => (
                     <div key={dim.name} style={{ background: '#27272a', borderRadius: '0.5rem', padding: '0.625rem' }}>
@@ -282,10 +275,8 @@ export default function App() {
                     </div>
                   ))}
                 </div>
-
               </div>
             ))}
-
           </div>
         )}
 
@@ -340,7 +331,6 @@ export default function App() {
                 <RadarChart profiles={dnaProfiles} />
               </div>
             )}
-
           </div>
         )}
 
@@ -433,9 +423,11 @@ export default function App() {
                 </div>
               </div>
             ))}
-
           </div>
         )}
+
+        {/* Trader tab */}
+        {activeTab === 'trader' && <TraderAnalyser />}
 
       </div>
     </div>

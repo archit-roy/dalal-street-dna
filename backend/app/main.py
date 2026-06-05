@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.core.config import settings
-from app.api.routes import stocks
+from app.api.routes import stocks, trader
 
 app = FastAPI(
     title=settings.APP_NAME,
@@ -16,7 +16,8 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-app.include_router(stocks.router, prefix="/api/stocks", tags=["Stocks"])
+app.include_router(stocks.router,  prefix="/api/stocks",  tags=["Stocks"])
+app.include_router(trader.router,  prefix="/api/trader",  tags=["Trader"])
 
 
 @app.get("/health")

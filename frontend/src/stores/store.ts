@@ -16,7 +16,7 @@ interface AppState {
   // UI
   loading: boolean
   error: string | null
-  activeTab: 'dna' | 'sector' | 'compare' | 'pulse'
+  activeTab: 'dna' | 'sector' | 'compare' | 'pulse' | 'trader'
 
   // Actions
   toggleSymbol: (symbol: string) => void
@@ -30,7 +30,7 @@ interface AppState {
   setEmbedding: (embedding: EmbeddingPoint[]) => void
   setLoading: (loading: boolean) => void
   setError: (error: string | null) => void
-  setActiveTab: (tab: 'dna' | 'sector' | 'compare' | 'pulse') => void
+  setActiveTab: (tab: 'dna' | 'sector' | 'compare' | 'pulse' | 'trader') => void
 }
 
 export const useAppStore = create<AppState>((set) => ({
