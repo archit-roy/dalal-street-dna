@@ -92,8 +92,18 @@ export default function App() {
   return (
     <div style={{ minHeight: '100vh', background: '#09090b', color: 'white' }}>
 
-      {/* Header */}
-      <div style={{ borderBottom: '1px solid #27272a', padding: '1rem', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+      {/* Header — sticky */}
+      <div style={{
+        borderBottom: '1px solid #27272a',
+        padding: '1rem',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        position: 'sticky',
+        top: 0,
+        zIndex: 50,
+        background: '#09090b',
+      }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
           <span style={{ color: '#22c55e', fontWeight: 900, fontSize: '1.25rem', letterSpacing: '-0.05em' }}>DALAL ST</span>
           <span style={{ color: '#3f3f46' }}>|</span>
@@ -121,8 +131,17 @@ export default function App() {
         </div>
       </div>
 
-      {/* Tabs */}
-      <div style={{ borderBottom: '1px solid #27272a', display: 'flex', padding: '0 1rem', overflowX: 'auto' }}>
+      {/* Tabs — sticky below header */}
+      <div style={{
+        borderBottom: '1px solid #27272a',
+        display: 'flex',
+        padding: '0 1rem',
+        overflowX: 'auto',
+        position: 'sticky',
+        top: '57px',
+        zIndex: 49,
+        background: '#09090b',
+      }}>
         {(['dna', 'sector', 'compare', 'trader'] as const).map(tab => (
           <button
             key={tab}
