@@ -5,6 +5,7 @@ import SignatureChart from './components/dna/SignatureChart'
 import RadarChart from './components/radar/RadarChart'
 import ScatterPlot from './components/radar/ScatterPlot'
 import TraderAnalyser from './components/trader/TraderAnalyser'
+import { SkeletonCard, SkeletonLabel } from './components/ui/Skeleton'
 
 const PERIODS = [
   { value: '3mo', label: '3M' },
@@ -24,6 +25,7 @@ export default function App() {
   } = useAppStore()
 
   const [loadingSymbol, setLoadingSymbol] = useState<string | null>(null)
+  const [pendingSymbols, setPendingSymbols] = useState<string[]>([])
 
   useEffect(() => {
     getSymbols().then(setSymbols).catch(() => setError('Failed to load symbols'))
@@ -35,13 +37,16 @@ export default function App() {
     setLoading(true)
     setError(null)
     clearDNAProfiles()
+    setPendingSymbols([...selectedSymbols])
     for (const symbol of selectedSymbols) {
       setLoadingSymbol(symbol)
       try {
         const dna = await getStockDNA(symbol, period)
         addDNAProfile(dna)
+        setPendingSymbols(prev => prev.filter(s => s !== symbol))
       } catch (e) {
         setError(`Failed to load ${symbol}`)
+        setPendingSymbols(prev => prev.filter(s => s !== symbol))
       }
     }
     setLoadingSymbol(null)
@@ -52,6 +57,7 @@ export default function App() {
     if (selectedSymbols.length < 2) return
     setLoading(true)
     setError(null)
+    setPendingSymbols([...selectedSymbols])
     try {
       const result = await compareStocks(selectedSymbols, period)
       clearDNAProfiles()
@@ -60,6 +66,7 @@ export default function App() {
     } catch (e) {
       setError('Failed to compare stocks')
     }
+    setPendingSymbols([])
     setLoading(false)
   }
 
@@ -67,6 +74,8 @@ export default function App() {
     setLoading(true)
     setError(null)
     setSelectedSector(sector)
+    const sectorStocks = sectors.find(s => s.sector === sector)?.stocks ?? []
+    setPendingSymbols(sectorStocks)
     try {
       const result = await getSectorDNA(sector, period)
       clearDNAProfiles()
@@ -75,6 +84,7 @@ export default function App() {
     } catch (e) {
       setError(`Failed to load ${sector} sector`)
     }
+    setPendingSymbols([])
     setLoading(false)
   }
 
@@ -88,8 +98,6 @@ export default function App() {
           <span style={{ color: '#3f3f46' }}>|</span>
           <span style={{ color: '#71717a', fontSize: '0.875rem' }}>Stock DNA</span>
         </div>
-
-        {/* Period selector */}
         <div style={{ display: 'flex', gap: '0.25rem' }}>
           {PERIODS.map(p => (
             <button
@@ -211,7 +219,7 @@ export default function App() {
 
                 {selectedSymbols.length > 0 && (
                   <button
-                    onClick={() => { clearSymbols(); clearDNAProfiles() }}
+                    onClick={() => { clearSymbols(); clearDNAProfiles(); setPendingSymbols([]) }}
                     style={{
                       padding: '0.75rem',
                       background: '#27272a',
@@ -229,6 +237,17 @@ export default function App() {
 
               {error && <p style={{ color: '#f87171', fontSize: '0.75rem', marginTop: '0.5rem' }}>{error}</p>}
             </div>
+
+            {/* Loading label */}
+            {loadingSymbol && (
+              <SkeletonLabel text={`Loading ${loadingSymbol}...`} />
+            )}
+
+            {/* Skeleton placeholders for pending symbols */}
+            {pendingSymbols
+              .filter(s => !dnaProfiles.find(p => p.symbol === s))
+              .map(s => <SkeletonCard key={s} />)
+            }
 
             {embedding.length > 0 && (
               <div style={{ background: '#18181b', borderRadius: '0.75rem', border: '1px solid #27272a', padding: '1rem' }}>
@@ -313,12 +332,10 @@ export default function App() {
             </div>
 
             {loading && (
-              <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', padding: '0.75rem', background: '#18181b', borderRadius: '0.75rem', border: '1px solid #27272a' }}>
-                <div style={{ width: '1rem', height: '1rem', borderRadius: '9999px', border: '2px solid #22c55e', borderTopColor: 'transparent', animation: 'spin 0.8s linear infinite' }} />
-                <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
-                <span style={{ color: '#71717a', fontSize: '0.875rem' }}>Building sector DNA...</span>
-              </div>
+              <SkeletonLabel text={`Building ${selectedSector} sector DNA...`} />
             )}
+
+            {loading && pendingSymbols.map(s => <SkeletonCard key={s} />)}
 
             {embedding.length > 0 && !loading && (
               <div style={{ background: '#18181b', borderRadius: '0.75rem', border: '1px solid #27272a', padding: '1rem' }}>
@@ -383,6 +400,9 @@ export default function App() {
                 {loading ? 'Loading...' : `Compare ${selectedSymbols.length} stocks`}
               </button>
             </div>
+
+            {loading && <SkeletonLabel text="Building comparison..." />}
+            {loading && pendingSymbols.map(s => <SkeletonCard key={s} />)}
 
             {embedding.length > 0 && (
               <div style={{ background: '#18181b', borderRadius: '0.75rem', border: '1px solid #27272a', padding: '1rem' }}>
