@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { useAppStore } from './stores/store'
 import { getSymbols, getSectors, getStockDNA, compareStocks, getSectorDNA } from './api'
 import SignatureChart from './components/dna/SignatureChart'
+import PriceChart from './components/dna/PriceChart'
 import RadarChart from './components/radar/RadarChart'
 import ScatterPlot from './components/radar/ScatterPlot'
 import TraderAnalyser from './components/trader/TraderAnalyser'
@@ -238,12 +239,10 @@ export default function App() {
               {error && <p style={{ color: '#f87171', fontSize: '0.75rem', marginTop: '0.5rem' }}>{error}</p>}
             </div>
 
-            {/* Loading label */}
             {loadingSymbol && (
               <SkeletonLabel text={`Loading ${loadingSymbol}...`} />
             )}
 
-            {/* Skeleton placeholders for pending symbols */}
             {pendingSymbols
               .filter(s => !dnaProfiles.find(p => p.symbol === s))
               .map(s => <SkeletonCard key={s} />)
@@ -279,7 +278,11 @@ export default function App() {
                   </div>
                 </div>
 
-                <SignatureChart dna={dna} />
+                <PriceChart dna={dna} />
+
+                <div style={{ marginTop: '1rem' }}>
+                  <SignatureChart dna={dna} />
+                </div>
 
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '0.5rem', marginTop: '1rem' }}>
                   {dna.style_dimensions.map(dim => (
